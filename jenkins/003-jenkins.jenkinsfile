@@ -5,17 +5,13 @@ pipeline {
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '7'))
-        // skipDefaultCheckout(true)
+        skipDefaultCheckout(true)
         disableConcurrentBuilds()
         timeout (time: 7, unit: 'MINUTES')
         timestamps()
     }
-    environment {
-        DB_USERNAME="admin"
-        DB_PASSWORD="your_actual_password" // Replace with actual password
-    }
     parameters {
-        string(name: 'BRANCH_NAME', defaultValue: 'dev', description: '')
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
     }
     stages {
         stage('Checkout') {
@@ -25,9 +21,7 @@ pipeline {
         }
 
         // Add subsequent stages for your pipeline
-    }
-
-    stages {
+   
         stage('Checkout') {
             steps {
                 sh """
