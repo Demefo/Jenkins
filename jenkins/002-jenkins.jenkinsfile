@@ -71,7 +71,7 @@ pipeline {
             steps {
                 sh """
                     echo "Deploying To Swarm. Please wait ....................."
-                    sleep 5
+                    sleep 10
                 """
             }
         }
@@ -79,7 +79,7 @@ pipeline {
             steps {
                 sh """
                     echo "Clean up. Please wait ....................."
-                    sleep 5
+                    sleep 10
                 """
             }
         }
