@@ -12,12 +12,21 @@ pipeline {
     }
     environment {
         DB_USERNAME="admin"
-        DB_PASSWORD="put-your-passwor-here"
+        DB_PASSWORD="your_actual_password" // Replace with actual password
     }
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'dev', description: '')
     }
-    
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: '${env.BRANCH_NAME}'
+            }
+        }
+
+        // Add subsequent stages for your pipeline
+    }
+
     stages {
         stage('Checkout') {
             steps {
