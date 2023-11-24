@@ -87,7 +87,7 @@ pipeline {
             steps {
                 sh """
                     echo "List contents. Please wait ....................."
-                    ls -l
+                    ls -lh
                     pwd
                     cd scripts
                     cat jenkins-master.sh
@@ -98,7 +98,7 @@ pipeline {
             steps {
                 sh """
                     echo "List contents. Please wait ....................."
-                    ls -l
+                    ls -lh
                     pwd
                 """
             }
