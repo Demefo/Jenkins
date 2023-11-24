@@ -14,7 +14,7 @@ pipeline {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
     }
     stages {
-        stage('Checkout') {
+        stage('Checkout01') {
             steps {
                 git branch: '${env.BRANCH_NAME}', url: 'git@github.com:Demefo/Jenkins.git'
             }
