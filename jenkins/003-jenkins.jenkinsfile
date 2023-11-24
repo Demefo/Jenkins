@@ -8,7 +8,7 @@ pipeline {
         skipDefaultCheckout(true)
         disableConcurrentBuilds()
         timeout (time: 7, unit: 'MINUTES')
-        timestamps()
+        // timestamps()
     }
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
@@ -16,7 +16,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: '${env.BRANCH_NAME}'
+                git branch: '${env.BRANCH_NAME}', url: 'git@github.com:Demefo/Jenkins.git'
             }
         }
 
