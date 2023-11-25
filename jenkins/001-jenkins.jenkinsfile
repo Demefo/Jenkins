@@ -11,7 +11,7 @@ pipeline {
     }
     
     parameters {
-        // Parameters definition goes here
+         booleanParam defaultValue: true, description: 'ready for prod', name: 'prod'
     }
     
     stages {
