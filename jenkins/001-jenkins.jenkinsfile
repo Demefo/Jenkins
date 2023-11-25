@@ -1,11 +1,15 @@
 pipeline {
     agent any
     options {
-        // Global options go here
+  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '3')
+  disableConcurrentBuilds()
+  skipDefaultCheckout true
+}
+    environment {
+  TOWN = "DOUALA"
+  JOB = "ENGINEER"
     }
-    environments {
-        // Environment-specific configurations go here
-    }
+    
     parameters {
         // Parameters definition goes here
     }
@@ -13,8 +17,18 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                git branch: 'main', changelog: false, credentialsId: 'github', url: 'git@github.com:Demefo/Jenkins.git'
                 // Build steps go here
                 // For example: sh 'mvn clean install'
+            }
+        }
+        stage('Build2') {
+            steps {
+                sh '''
+                ls -lh
+                pwd
+                sleep 30
+                '''
             }
         }
         // Add more stages as needed
