@@ -1,13 +1,13 @@
 pipeline {
     agent any
     options {
-  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '3')
-  disableConcurrentBuilds()
-  skipDefaultCheckout true
-}
+        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '3')
+        disableConcurrentBuilds()
+        skipDefaultCheckout true
+    }
     environment {
-  TOWN = "DOUALA"
-  JOB = "ENGINEER"
+        TOWN = "DOUALA"
+        JOB = "ENGINEER"
     }
     
     parameters {
@@ -35,11 +35,11 @@ pipeline {
     }
     
     post {
-        // always {
-        //     // Actions to run regardless of success or failure
-        //     // For example, you can archive artifacts here
-        //     echo 'Pipeline succeeded!'
-        // }
+        always {
+            // Actions to run regardless of success or failure
+            // For example, you can archive artifacts here
+            echo 'Pipeline completed!'
+        }
         success {
             // Actions to run when the pipeline succeeds
             // For example, you can send a notification here
@@ -52,4 +52,3 @@ pipeline {
         }
     }
 }
-
