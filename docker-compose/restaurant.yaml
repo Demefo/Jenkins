@@ -1,0 +1,133 @@
+version: '3'
+services:
+  ## frontend
+  yelb-ui:
+    depends_on:
+      - yelb-appserver
+    ports:
+      - 80:80
+    image: mreferre/yelb-ui:0.7
+    networks:
+      - odilianetwork
+
+  ## API
+  yelb-appserver:
+    hostname: chris
+    depends_on:
+      - yelb-db
+      - redis-server
+    image: mreferre/yelb-appserver:0.5
+    networks:
+      - odilianetwork
+
+  ## backend services compose of redis server for caching and a postgres database 
+  redis-server:
+    image: redis:4.0.2
+    volumes:
+      - ./redis-server:/etc/redis/redis.conf
+      - redis01:/data
+    networks:
+      - odilianetwork
+    
+  odilia-redis01:
+    image: redis:4.0.2
+    volumes:
+      - ./odilia-redis01:/etc/redis/redis.conf
+      - redis02:/data
+    networks:
+      - odilianetwork
+    command: redis-server /etc/redis/redis.conf 
+
+  odilia-redis02:
+    image: redis:4.0.2
+    volumes:
+      - ./odilia-redis02:/etc/redis/redis.conf
+      - redis03:/data
+    networks:
+      - odilianetwork
+    command: redis-server /etc/redis/redis.conf 
+
+  odilia-redis-sentinel01:
+    image: redis:4.0.2
+    depends_on:
+      - redis-server
+      - odilia-redis01
+      - odilia-redis02
+    volumes:
+      - ./Odilia-redis-sentinel01:/etc/redis/sentinel.conf
+    networks:
+      - odilianetwork
+    command: redis-sentinel /etc/redis/sentinel.conf 
+
+  odilia-redis-sentinel02:
+    image: redis:4.0.2
+    depends_on:
+      - redis-server
+      - odilia-redis01
+      - odilia-redis02
+    volumes:
+      - ./Odilia-redis-sentinel02:/etc/redis/sentinel.conf
+    networks:
+      - odilianetwork
+    command: redis-sentinel /etc/redis/sentinel.conf 
+
+  odilia-redis-sentinel03:
+    image: redis:4.0.2
+    depends_on:
+      - redis-server
+      - odilia-redis01
+      - odilia-redis02
+    volumes:
+      - ./Odilia-redis-sentinel03:/etc/redis/sentinel.conf
+    networks:
+      - odilianetwork
+    command: redis-sentinel /etc/redis/sentinel.conf
+
+  yelb-db:
+    image: mreferre/yelb-db:0.5
+    volumes:
+      - odiliadb01:/var/lib/postgresql/data
+    networks:
+      - odilianetwork
+
+  yelb-db-replica02:
+    image: mreferre/yelb-db:0.5
+    volumes:
+      - odiliadb02:/var/lib/postgresql/data
+    networks:
+      - odilianetwork
+  yelb-db-replica01:
+    image: mreferre/yelb-db:0.5
+    volumes:
+     - odiliadb03:/var/lib/postgresql/data
+    networks:
+     - odilianetwork
+  yelb-db-replica04:
+    image: mreferre/yelb-db:0.5
+    volumes:
+     - odiliadb04:/var/lib/postgresql/data
+    networks:
+      - odilianetwork
+
+## declaration of all volumes 
+volumes:
+  redis01:
+    driver: local
+  redis02:
+    driver: local
+  redis03:
+    driver: local
+  odiliadb01:
+    driver: local
+  odiliadb02:
+    driver: local
+  odiliadb03:
+    driver: local
+  odiliadb04:
+    driver: local
+  
+## declaration of network
+networks:
+  odilianetwork:
+    driver: bridge
+  
