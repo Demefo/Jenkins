@@ -1,0 +1,105 @@
+version: "3.3"
+services:
+  petclinic:
+    image: rudiori/del-images:petclinic
+    ports:
+      - 8000:8000
+      - 8087:8080                                
+    environment:
+      - SERVER_PORT=8080
+      - MYSQL_URL=jdbc:mysql://mysqlserver/petclinic
+    volumes:
+      - data:/app
+    depends_on:
+      - mysqlserver
+      - redis-0
+    networks:
+      - rudi
+    
+  mysqlserver:
+    image: mysql:8
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_USER=petclinic
+      - MYSQL_PASSWORD=petclinic
+      - MYSQL_DATABASE=petclinic
+  
+  redis-0:
+    container_name: redis-0
+    image: redis:4.0.2
+    volumes:
+      - redis1:/data
+      - ./redis-0:/etc/redis/redis.conf
+    networks:
+      - rudi
+
+  redis-01:
+    container_name: redis-01
+    image: redis:4.0.2
+    volumes:
+      - redis2:/data
+      - ./redis-01:/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf
+    networks:
+      - rudi
+
+  redis-02:
+    container_name: redis-02
+    image: redis:4.0.2
+    volumes:
+      - redis3:/data
+      - ./redis-02:/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf
+    networks:
+      - rudi
+
+  sentinel-01:
+    container_name: sentinel-01
+    image: redis:4.0.2
+    volumes:
+      - ./sentinel-01:/etc/redis/sentinel.conf
+    command: redis-sentinel /etc/redis/sentinel.conf
+    networks:
+      - rudi
+
+  sentinel-02:
+    container_name: sentinel-02
+    image: redis:4.0.2
+    volumes:
+      - ./sentinel-02:/etc/redis/sentinel.conf
+    command: redis-sentinel /etc/redis/sentinel.conf
+    networks:
+      - rudi
+
+  sentinel-03:
+    container_name: sentinel-03
+    image: redis:4.0.2
+    volumes:
+      - ./sentinel-03:/etc/redis/sentinel.conf
+    command: redis-sentinel /etc/redis/sentinel.conf
+    networks:
+      - rudi
+volumes:
+  mysql_data:
+    driver: local
+  mysql_config:
+    driver: local
+  mysql_data1:
+    driver: local
+  mysql_config1:
+    driver: local
+  data:
+    driver: local
+  redis1:
+    driver: local
+  redis2:
+    driver: local
+  redis3:
+    driver: local
+
+networks:
+  rudi:
+    driver: bridge

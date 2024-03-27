@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: petclinic
+  template:
+    metadata:
+      labels:
+        app: petclinic
+    spec:
+      containers:
+        - name: petclinic
+          image: rudiori/del-images:petclinic
+          ports:
+            - containerPort: 8000
+            - containerPort: 8080
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: MYSQL_URL
+              value: jdbc:mysql://mysqlserver/petclinic
+      volumes:
+        - name: data
+          emptyDir: {}
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic
+spec:
+  selector:
+    app: petclinic
+  ports:
+    - name: port-8000
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+    - name: port-8080
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: NodePort
+

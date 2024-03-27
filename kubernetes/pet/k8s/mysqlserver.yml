@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysqlserver
+spec:
+  replicas: 2
+  serviceName: mysqlserver
+  selector:
+    matchLabels:
+      app: mysqlserver
+  template:
+    metadata:
+      labels:
+        app: mysqlserver
+    spec:
+      containers:
+        - name: mysqlserver
+          image: mysql:8
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: ""
+            - name: MYSQL_ALLOW_EMPTY_PASSWORD
+              value: "true"
+            - name: MYSQL_USER
+              value: petclinic
+            - name: MYSQL_PASSWORD
+              value: petclinic
+            - name: MYSQL_DATABASE
+              value: petclinic
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysqlserver
+spec:
+  selector:
+    app: mysqlserver
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
