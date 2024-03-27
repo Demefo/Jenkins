@@ -1,4 +1,4 @@
-# a1-devops
+# COURSES
 - devlarative pipeline Vs scripted pepeline
 - all jenkins environment variables
 - node pipeline example
