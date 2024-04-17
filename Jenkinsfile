@@ -1,78 +1,60 @@
 pipeline {
     agent any
     tools {
-         jdk 'java17'
-         maven 'maven3'
+        jdk 'java17'
+        maven 'maven3'
     }
     environment {
-	    APP_NAME = "register-app-pipeline"
-            RELEASE = "1.0.0"
-            DOCKER_USER = "rudiori"
-            DOCKER_PASS = 'dockerhub'
-            IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
-            IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+        APP_NAME = "register-app-pipeline"
+        RELEASE = "1.0.0"
+        DOCKER_USER = "rudiori"
+        DOCKER_PASS = credentials('dockerhub') // Assuming 'dockerhub' is the ID of your Jenkins credentials
+        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
-    stages{
+    stages {
         stage("Cleanup Workspace") {
-              steps {
-              cleanWs()
-              }
+            steps {
+                cleanWs()
+            }
         }
 
-        stage ("Checkout from SCM"){
-              steps {
-              git branch: 'main' , credentialsId: 'personal-git' , url: 'https://github.com/Demefo/Jenkins'
-              }
+        stage("Checkout from SCM") {
+            steps {
+                git branch: 'main', credentialsId: 'personal-git', url: 'https://github.com/Demefo/Jenkins'
+            }
         }
 
-        
-        stage("Build Application"){
+        stage("Build Application") {
             steps {
                 sh "mvn clean package"
             }
+        }
 
-       }
+        stage("Test Application") {
+            steps {
+                sh "mvn test"
+            }
+        }
 
-       stage("Test Application"){
-           steps {
-                 sh "mvn test"
-           }
-       }
+        stage("SonarQube Analysis") {
+            steps {
+                withSonarQubeEnv(credentialsId: 'sonarqube') {
+                    sh "mvn sonar:sonar"
+                }
+            }
+        }
 
-       stage("SonarQube Analysis"){
-           steps {
-	           script {
-		        withSonarQubeEnv(credentialsId: 'sonarqube') { 
-                        sh "mvn sonar:sonar"
-		        }
-	           }	
-           }
-       }
-
-       // stage("Quality Gate"){
-       //     steps {
-       //         script {
-       //              waitForQualityGate abortPipeline: false, credentialsId: 'sonarqube'
-       //          }	
-       //      }
-
-       //  }
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', ${DOCKER_PASS} ) {
-                        docker_image = docker.build "${IMAGE_NAME}"
-                    }
-
-                    docker.withRegistry('https://index.docker.io/v1/', ${DOCKER_PASS}) {
-                        docker_image.push("${IMAGE_TAG}")
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_USER, DOCKER_PASS) {
+                        def docker_image = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                        docker_image.push()
                         docker_image.push('latest')
                     }
                 }
             }
-
-       }
-
-   }
+        }
+    }
 }
-
