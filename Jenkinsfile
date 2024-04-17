@@ -8,7 +8,7 @@ pipeline {
         APP_NAME = "register-app-pipeline"
         RELEASE = "1.0.0"
         DOCKER_USER = "rudiori"
-        DOCKER_PASS = credentials('dockerhub') // Assuming 'dockerhub' is the ID of your Jenkins credentials
+        DOCKER_PASS = ''
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
@@ -44,6 +44,14 @@ pipeline {
                 }
             }
         }
+
+        stage("Set Docker Credentials") {
+        steps {
+            script {
+                DOCKER_PASS = credentials('dockerhub')
+            }
+        }
+    }
 
         stage("Build & Push Docker Image") {
             steps {
