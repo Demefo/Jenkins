@@ -46,15 +46,16 @@ pipeline {
         }
 
         stage("Build & Push Docker Image") {
-            steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_USER, DOCKER_PASS) {
-                        def docker_image = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-                        docker_image.push()
-                        docker_image.push('latest')
-                    }
-                }
+    steps {
+        script {
+            docker.withRegistry('https://index.docker.io/v1/', DOCKER_USER, DOCKER_PASS) {
+                def dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                dockerImage.push()
+                dockerImage.push('latest')
             }
         }
+    }
+    }
+    }
     }
 }
