@@ -90,7 +90,7 @@ pipeline {
        stage("Trigger CD Pipeline") {
             steps {
                 script {
-                    sh "curl -v -k --user rudi:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'https://6c5a-129-0-60-24.ngrok-free.app:8080/job/register-app-cd/buildWithParameters?token=gitops-token'"
+                    sh "curl -v -k --user rudi:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'http://172.21.199.50:8080/job/register-app-cd/buildWithParameters?token=gitops-token'"
                 }
             }
        }
