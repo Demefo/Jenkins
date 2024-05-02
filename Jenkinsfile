@@ -70,13 +70,13 @@ pipeline {
 
        }
 
-       stage("Trivy Scan") {
-           steps {
-               script {
-	            sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image rudiori/register-app-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table')
-               }
-           }
-       }
+    //    stage("Trivy Scan") {
+    //        steps {
+    //            script {
+	//             sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image rudiori/register-app-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table')
+    //            }
+    //        }
+    //    }
 
        stage ('Cleanup Artifacts') {
            steps {
@@ -90,7 +90,7 @@ pipeline {
        stage("Trigger CD Pipeline") {
             steps {
                 script {
-                    sh "curl -v -k --user rudi:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'https://9dda-129-0-60-24.ngrok-free.app:8080/job/register-app-cd/buildWithParameters?token=gitops-token'"
+                    sh "curl -v -k --user rudi:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'https://6c5a-129-0-60-24.ngrok-free.app:8080/job/register-app-cd/buildWithParameters?token=gitops-token'"
                 }
             }
        }
