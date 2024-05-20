@@ -46,7 +46,7 @@ pipeline {
             }
         }
 
-        stage("Set Docker Credentials") {
+        stage("Set Docker passkeys") {
         steps {
             script {
                 DOCKER_PASS = credentials('dockerhub')
