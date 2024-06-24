@@ -1,0 +1,62 @@
+pipeline {
+  agent any
+  tools {
+    jdk 'java17'
+    maven 'maven3'
+  }
+  environment {
+    APP_NAME = "register-app-pipeline"
+    RELEASE = "1.0.1"
+    DOCKER_USER = "rudiori"
+    DOCKER_PASS = ''
+    IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+    IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+    JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
+  }
+  stages {
+    stage("Cleanup Workspace") {
+      steps {
+        cleanWs()
+      }
+    }
+
+    stage("Checkout from SCM") {
+      steps {
+        git branch: 'main', credentialsId: 'personal-git', url: 'https://github.com/Demefo/Jenkins'
+      }
+    }
+
+    stage("Set Docker passkeys") {
+      steps {
+        script {
+          dir("${WORKSPACE}/jenkinsfiles") {
+            sh """
+              ls -l
+            """ 
+          }
+          DOCKER_PASS = credentials('dockerhub')
+        }
+      }
+    }
+
+    stage("Build and Run Container") {
+      steps {
+        script {
+            dir("${WORKSPACE}/jenkinsfiles") {
+          // Build the image with -t argument
+          docker.build "${IMAGE_NAME}"
+          // Run the container with privileged mode (not recommended)
+          docker.run(
+              image: "${IMAGE_NAME}",
+              privileged: true,
+              workingDir: '/usr/local/apache2/htdocs/',
+              containerName: 'my-container'
+          ) {
+            sh 'docker exec -it my-container ls -l' // Run `ls -l` command inside the container
+          }
+            }
+        }
+      }
+    }
+  }
+}
