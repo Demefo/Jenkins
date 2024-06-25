@@ -1,22 +1,38 @@
-FROM alpine:latest
+FROM httpd
 
-# Set working directory for the application
+#updating the system
+RUN apt update -y 
+
+#variables
+ARG port=5433
+
+#creating volume
+VOLUME /saves
+
+#copy from host to the container
+COPY . /saves
+#Installing useful packages
+Run apt install -y unzip 
+
+#Container working directory
 WORKDIR /usr/local/apache2/htdocs/
 
-# Install Apache
-RUN apk add --no-cache apache2 unzip
+#Preparing the folder++
+RUN rm -rf * 
 
-# Download the covid19.zip file
-RUN wget https://linux-devops-course.s3.amazonaws.com/covid19.zip
+#collecting the developer code
+ADD   https://linux-devops-course.s3.amazonaws.com/halloween.zip .
 
-# Extract the zip file
-RUN unzip covid19.zip
+#unzipping the directiory
+RUN unzip halloween.zip && \
+    cp -r halloween/* . && \
+    rm -rf halloween*
 
-# Define volume to persist data (optional)
-VOLUME /Saves
+#expose the container
+EXPOSE ${port}
 
-# Expose port for Apache
-EXPOSE 80
 
-# (Optional) Set CMD to start Apache in foreground
-CMD ["httpd", "-D", "FOREGROUND"]
+
+
+
+
