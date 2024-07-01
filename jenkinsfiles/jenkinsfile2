@@ -9,7 +9,7 @@ pipeline {
     RELEASE = "1.0.1"
     DOCKER_USER = "rudiori"
     DOCKER_PASS = ''
-    IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+    IMAGE_NAME = "${DOCKER_USER}/test"
     IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
   }
@@ -46,17 +46,14 @@ pipeline {
           // Build the image with -t argument
           docker.build "${IMAGE_NAME}"
           // Run the container with privileged mode (not recommended)
-          docker.run(
-              image: "${IMAGE_NAME}",
-              privileged: true,
-              workingDir: '/usr/local/apache2/htdocs/',
-              containerName: 'my-container'
-          ) {
-            sh 'docker exec -it my-container ls -l' // Run `ls -l` command inside the container
+          
+            sh ' 
+            docker run -i ${IMAGE_NAME} ls -l '
+             // Run `ls -l` command inside the container
           }
             }
         }
       }
     }
   }
-}
+
