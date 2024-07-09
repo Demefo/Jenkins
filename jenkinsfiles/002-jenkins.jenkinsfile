@@ -1,119 +1,85 @@
 pipeline {
-    agent any
-    triggers {
-        githubPush() // Enable GitHub webhook trigger for GitSCM polling
-    }
+    agent any 
+
     options {
-        buildDiscarder(logRotator(numToKeepStr: '3'))
-        skipDefaultCheckout(true)
-        disableConcurrentBuilds()
-        timeout (time: 4, unit: 'MINUTES')
-        timestamps()
+        timeout(time: 10, unit: 'MINUTES') // Timeout for the entire pipeline
+        buildDiscarder(logRotator(numToKeepStr: '5')) // Discard old builds to save disk space
+        disableConcurrentBuilds() // Ensures that only one build can run at a time
+        timestamps() // Adds timestamps to the console output
+        skipDefaultCheckout() // Skips the default checkout of source code, useful if you're doing a custom checkout
+        // retry(3) // Automatically retries the entire pipeline up to 3 times if it fails
     }
-    environment {
-        DB_USERNAME="admin"
-        DB_PASSWORD="put-your-passwor-here"
-    }
+
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: '')
+        choice(name: 'APP', choices: ['', 'covid19', 'articles', 'halloween'], description: 'Select the app that you want to download')
+        booleanParam(name: 'INSTALL_APACHE', defaultValue: false, description: 'Install Apache')
     }
-    
+
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                sh """
-                    echo "Cloning the repo. Please wait ....................."
-                    sleep 5
-                """
+                script {
+                    git credentialsId: 'personal-git',
+                        url: 'https://github.com/Demefo/Terraform.git',
+                        branch: "${params.BRANCH_NAME}"
+                }
             }
         }
-        stage('Building') {
+
+        stage('Install Apache') {
+            when {
+                expression { return params.INSTALL_APACHE }
+            }
             steps {
-                sh """
-                    echo "Building the code. Please wait ....................."
-                    sleep 5
-                """
+                sh '''
+                sudo apt-get update
+                sudo apt-get install -y apache2
+                '''
             }
         }
-        stage('Scanning') {
+
+        stage('Deploy') {
             steps {
-                sh """
-                    echo "Scanning the code. Please wait ....................."
-                    sleep 5
-                """
+                echo "Selected APP: ${params.APP}"
+                script {
+                    if (params.APP == 'covid19') {
+                        sh '''
+                        ls -l ec2/
+                        rm -rf terraform*
+                        wget https://linux-devops-course.s3.amazonaws.com/WEB+SIDE+HTML/covid19.zip
+                        unzip -o covid19.zip
+                        ls -l covid19
+                        sudo rm -rf /var/www/html/*
+                        sudo cp -r covid19/* /var/www/html
+                        '''
+                    } 
+                    else if (params.APP == 'articles') {
+                        sh '''
+                        ls -la eip/
+                        wget https://linux-devops-course.s3.amazonaws.com/articles.zip
+                        unzip -o articles.zip
+                        ls -l articles
+                        sudo rm -rf /var/www/html/*
+                        sudo cp -r articles/* /var/www/html
+                        '''
+                    } 
+                    else if (params.APP == 'halloween') {
+                        sh '''
+                        ls -lh
+                        rm -rf *_linux_amd64.zip
+                        wget https://linux-devops-course.s3.amazonaws.com/halloween.zip
+                        unzip -o halloween.zip 
+                        ls -l
+                        sudo rm -rf /var/www/html/*
+                        sudo cp -r halloween/* /var/www/html
+                        '''
+                    } 
+                    else {
+                        error 'Unknown APP selected'
+                    }
+                }
             }
-        }
-        stage('Packaging') {
-            steps {
-                sh """
-                    echo "Packaging the code. Please wait ....................."
-                    sleep 5
-                """
-            }
-        }
-        stage('Building the image') {
-            steps {
-                sh """
-                    echo "Building the image. Please wait ....................."
-                    sleep 5
-                """
-            }
-        }
-        stage('Pushing into Dockerhub') {
-            steps {
-                sh """
-                    echo "Pushing into Dockerhub. Please wait ....................."
-                    sleep 5
-                """
-            }
-        }
-        stage('Deploying To Swarm') {
-            steps {
-                sh """
-                    echo "Deploying To Swarm. Please wait ....................."
-                    sleep 10
-                """
-            }
-        }
-        stage('Clean up') {
-            steps {
-                sh """
-                    echo "Clean up. Please wait ....................."
-                    sleep 10
-                """
-            }
-        }
-        stage('List contents') {
-            steps {
-                sh """
-                    echo "List contents. Please wait ....................."
-                    ls -lh
-                    pwd
-                    cd scripts
-                    cat jenkins-master.sh
-                """
-            }
-        }
-        stage('End Job') {
-            steps {
-                sh """
-                    echo "List contents. Please wait ....................."
-                    ls -lh
-                    pwd
-                """
-            }
-        }
-    }
-    post {
-        success {
-            echo 'Pipeline succeeded!'
-            // You can add more actions for success here
-        }
-        failure {
-            echo 'Pipeline failed!'
-            // You can add more actions for failure here
         }
     }
 }
-
-

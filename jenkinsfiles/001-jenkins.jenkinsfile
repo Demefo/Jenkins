@@ -170,28 +170,7 @@ pipeline {
                 }
             }
         }
-        // stage('ls') {
-        //     steps {
-        //         script {
-        //             sh """
-        //                 ls -l /
-        //                 #!/bin/bash
 
-        //                 # Install dependencies
-        //                 sudo apt-get update -y
-        //                 sudo apt-get install -y wget unzip
-        //                 rm -rf *
-        //                 wget https://releases.hashicorp.com/terraform/${params.TERRAFORM_VERSION}/terraform_${params.TERRAFORM_VERSION}_linux_amd64.zip
-        //                 unzip terraform_${params.TERRAFORM_VERSION}_linux_amd64.zip
-        //                 sudo mv terraform ${params.TERRAFORM_BANARY_NAME}
-        //                 sudo mv ${params.TERRAFORM_BANARY_NAME} /usr/local/bin/
-
-        //                 # Verify installation
-        //                 ${params.TERRAFORM_BANARY_NAME} --version
-        //             """
-        //         }
-        //     }
-        // }
     }
 }
 
